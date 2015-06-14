@@ -41,7 +41,7 @@ class TestFlightResults(unittest.TestCase):
     def tearDown(self):
         # on failure make screenshot, raw html, save to logging folder and send to dropbox
         if sys.exc_info()[0]:
-           key = 'TbN0tgnVu2oAAAAAAAAAD90u6_0IFv9kNEXnpD9c2inLh1Qwi-68-TyYMQsL6j48'
+           key = 'R-vAnKZ3hZAAAAAAAAAABlTYOB_2vPLcGoqgFdGR7jR9ELgJHzCRj4RA6YIF4HVA'
            self.client = dropbox.client.DropboxClient(key)
            file_path = os.path.join(self.log_folder, self._testMethodName)
            img_file_path = file_path + '.png'
