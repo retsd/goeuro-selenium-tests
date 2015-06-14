@@ -72,6 +72,7 @@ class SearchResultsPage(BasePage):
     
     def get_flight_sorted_prices(self):
         d = self.driver
+        d.find_element(*SearchPageLocators.FLIGHTS_TAB).click()
         flight_prices = []
         wait = WebDriverWait(self.driver, 20)
         wait.until(EC.visibility_of_element_located(SearchPageLocators.CURRENCY_BEFORE_COMMA))
@@ -107,6 +108,7 @@ class MainPageLocators():
 
 
 class SearchPageLocators():
+    FLIGHTS_TAB = (By.CSS_SELECTOR, '#tab_flight a')
     NEXT_FLIGHTS = (By.CSS_SELECTOR, '#results-flight .pagination .next a')
     CURRENCY_BEFORE_COMMA = (By.CSS_SELECTOR, '.price-cell-total .currency-beforecomma')
     CURRENCY_DECIMALS = (By.CSS_SELECTOR, '.price-cell-total span:nth-child(3)')
