@@ -2,7 +2,6 @@
 
 import unittest
 import logging
-import time
 import sys
 import os
 import shutil
@@ -41,16 +40,16 @@ class TestFlightResults(unittest.TestCase):
     def tearDown(self):
         # on failure make screenshot, raw html, save to logging folder and send to dropbox
         if sys.exc_info()[0]:
-           key = 'R-vAnKZ3hZAAAAAAAAAABlTYOB_2vPLcGoqgFdGR7jR9ELgJHzCRj4RA6YIF4HVA'
-           self.client = dropbox.client.DropboxClient(key)
-           file_path = os.path.join(self.log_folder, self._testMethodName)
-           img_file_path = file_path + '.png'
-           html_file_path = file_path + '.html'
-           self.driver.get_screenshot_as_file(img_file_path)
-           self.client.put_file(img_file_path, open(img_file_path))
-           with open(html_file_path, 'w') as f:
-               f.write(self.driver.page_source.encode('utf-8'))
-           self.client.put_file(html_file_path, open(html_file_path))        
+            key = 'R-vAnKZ3hZAAAAAAAAAABlTYOB_2vPLcGoqgFdGR7jR9ELgJHzCRj4RA6YIF4HVA'
+            self.client = dropbox.client.DropboxClient(key)
+            file_path = os.path.join(self.log_folder, self._testMethodName)
+            img_file_path = file_path + '.png'
+            html_file_path = file_path + '.html'
+            self.driver.get_screenshot_as_file(img_file_path)
+            self.client.put_file(img_file_path, open(img_file_path))
+            with open(html_file_path, 'w') as f:
+                f.write(self.driver.page_source.encode('utf-8'))
+            self.client.put_file(html_file_path, open(html_file_path))
         self.driver.quit()
 
 
@@ -69,7 +68,7 @@ class MainPage(BasePage):
 
 
 class SearchResultsPage(BasePage):
-    
+
     def get_flight_sorted_prices(self):
         d = self.driver
         d.find_element(*SearchPageLocators.FLIGHTS_TAB).click()
@@ -78,10 +77,10 @@ class SearchResultsPage(BasePage):
         wait.until(EC.visibility_of_element_located(SearchPageLocators.CURRENCY_BEFORE_COMMA))
         while True:
             currency_before_comma_items = d.find_elements(*SearchPageLocators.CURRENCY_BEFORE_COMMA)
-            currency_before_comma = map(lambda elem : elem.text.replace('.', ''),
+            currency_before_comma = map(lambda elem: elem.text.replace('.', ''),
                                         currency_before_comma_items)
             currency_decimals_items = d.find_elements(*SearchPageLocators.CURRENCY_DECIMALS)
-            currency_decimals = map(lambda elem : elem.text,
+            currency_decimals = map(lambda elem: elem.text,
                                     currency_decimals_items)
             flight_prices_on_page = [float(str(x) + '.' + str(y))
                                      for x, y in zip(currency_before_comma, currency_decimals)]
@@ -99,8 +98,8 @@ class SearchResultsPage(BasePage):
         except NoSuchElementException:
             return False
         return True
-    
-    
+
+
 class MainPageLocators():
     SEARCH = (By.ID, 'search-form__submit-btn')
     FROM = (By.ID, 'from_filter')
