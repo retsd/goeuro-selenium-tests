@@ -3,6 +3,10 @@
 import unittest
 import logging
 import time
+import sys
+import os
+import shutil
+import dropbox
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,13 +16,6 @@ from selenium.common.exceptions import NoSuchElementException
 
 class TestFlightResults(unittest.TestCase):
     """Test results on flight results page"""
-    def setUp(self):
-        self.driver = webdriver.Firefox()
-        self.driver.maximize_window()
-        self.driver.get('http://www.goeuro.de/')
-
-    def tearDownS(self):
-        self.driver.quit()
 
     def test_flight_sorting_by_price(self):
         """Test flight sorting by price is correct"""
@@ -27,6 +24,34 @@ class TestFlightResults(unittest.TestCase):
         search_results_page = SearchResultsPage(self.driver)
         flight_prices = search_results_page.get_flight_sorted_prices()
         self.assertEqual(flight_prices, sorted(flight_prices))
+
+    @classmethod
+    def setUpClass(self):
+        self.log_folder = 'logging'
+        # clear logging folder
+        if os.path.exists(self.log_folder):
+            shutil.rmtree(self.log_folder)
+        os.makedirs(self.log_folder)
+
+    def setUp(self):
+        self.driver = webdriver.Firefox()
+        self.driver.maximize_window()
+        self.driver.get('http://www.goeuro.de/')
+
+    def tearDown(self):
+        # on failure make screenshot, raw html, save to logging folder and send to dropbox
+        if sys.exc_info()[0]:
+           key = 'TbN0tgnVu2oAAAAAAAAAD90u6_0IFv9kNEXnpD9c2inLh1Qwi-68-TyYMQsL6j48'
+           self.client = dropbox.client.DropboxClient(key)
+           file_path = os.path.join(self.log_folder, self._testMethodName)
+           img_file_path = file_path + '.png'
+           html_file_path = file_path + '.html'
+           self.driver.get_screenshot_as_file(img_file_path)
+           self.client.put_file(img_file_path, open(img_file_path))
+           with open(html_file_path, 'w') as f:
+               f.write(self.driver.page_source.encode('utf-8'))
+           self.client.put_file(html_file_path, open(html_file_path))        
+        self.driver.quit()
 
 
 class BasePage():
@@ -65,8 +90,6 @@ class SearchResultsPage(BasePage):
                 wait.until(EC.staleness_of(currency_before_comma_items[0]))
             else:
                 break
-        logger = logging.getLogger('logger')
-        logger.debug(flight_prices)
         return flight_prices
 
     def check_element(self, locator):
